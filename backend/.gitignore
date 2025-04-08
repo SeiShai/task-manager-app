@@ -1,31 +1,11 @@
-# General
-*.log
-*.tmp
-*.temp
-*.pid
-*.seed
-*.pid.lock
-*.bak
-*.orig
-*.rej
+# Python bytecode
+*.py[cod]
+__pycache__/
+*.so
 
 # Environment variables
 .env
 .env.*.local
-
-# Dependency directories
-node_modules/
-bower_components/
-__pycache__/
-*.py[cod]
-*.so
-
-# Build directories
-dist/
-build/
-out/
-coverage/
-htmlcov/
 
 # Flask-specific
 instance/
@@ -35,18 +15,36 @@ instance/
 *.pyo
 *.pyd
 
-# React-specific
-node_modules/
-*.cache
-.eslintcache
-.stylelintcache
-.prettiercache
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
 
 # Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+*.log
+*.tmp
+*.temp
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+.pytest_cache/
+.tox/
+.coverage
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Build directories
+dist/
+build/
+htmlcov/
+*.egg-info/
+.eggs/
 
 # System files
 Thumbs.db
@@ -56,44 +54,14 @@ $RECYCLE.BIN/
 .DS_Store
 
 # IDE-specific files
-*.iml
 .idea/
 .vscode/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Testing files
-.jest/
-.vitest/
-.pytest_cache/
-.tox/
-.coverage
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-
-# Package manager lock files (optional)
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Virtual environment
-venv/
-env/
-ENV/
-.venv/
-.virtualenv/
+*.iml
 
 # Miscellaneous
-*.gz
-*.zip
-*.tgz
 *.bak
 *.orig
 *.rej
+*.gz
+*.zip
+*.tgz

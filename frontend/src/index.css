@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* 👇 Add these below the Tailwind directives */
+@keyframes spin-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  @keyframes blob-pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.5;
+    }
+  }
+  
+  /* 👇 Custom utilities using @layer */
+  @layer utilities {
+    .animate-spin-slow {
+      animation: spin-slow 12s linear infinite;
+    }
+  
+    .animate-blob-pulse {
+      animation: blob-pulse 6s ease-in-out infinite;
+    }
+  }

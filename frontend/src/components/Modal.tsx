@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Trash2 } from "lucide-react";
 import {
   Select,
@@ -7,15 +7,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import axios from "axios";
+import { createTask } from "@/services/TaskApi";
 
-function TaskModal({ onClose }: { onClose: () => void }) {
-  const [taskName, setTaskName] = useState("");
+function TaskModal({ onClose, refreshTasks }: { onClose: () => void; refreshTasks: () => void }) {
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
+  const [deadline, setDeadline] = useState("");
   const [subTask, setSubTask] = useState("");
   const [subTasks, setSubTasks] = useState<string[]>([]);
 
+  // Function to handle adding a subtask
   const handleAddSubTask = () => {
     if (subTask.trim()) {
       setSubTasks([...subTasks, subTask]);
@@ -23,17 +25,29 @@ function TaskModal({ onClose }: { onClose: () => void }) {
     }
   };
 
+  // Function to handle removing a subtask
   const handleRemoveSubTask = (index: number) => {
     setSubTasks(subTasks.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
-    // Handle form submission
-    console.log({ taskName, description, status, subTasks });
-    onClose();
+  // Function to print form submission
+  const handleSubmit = async () => {
+    const taskData = {
+      title,
+      description,
+      status,
+      deadline,
+      subTasks,
+    };
+    try {
+      const savedTask = await createTask(taskData);
+      console.log("Task saved:", savedTask);
+      refreshTasks();
+      onClose();
+    } catch (error) {
+      console.error("Error saving task:", error);
+    }
   };
-
-  
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 backdrop-blur-sm">
@@ -65,8 +79,8 @@ function TaskModal({ onClose }: { onClose: () => void }) {
             <input
               id="task-name"
               type="text"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter task name"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900"
             />
@@ -90,26 +104,47 @@ function TaskModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          {/* Status */}
-          <div className="space-y-2">
-            <label
-              htmlFor="status"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Status
-            </label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger id="status" className="w-full">
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Status and deadline */}
+          <div className="flex space-x-4 items-end">
+            {/* Status dropdown */}
+            <div className="w-1/2 space-y-2">
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Status
+              </label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger id="status" className="w-full">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
+                  <SelectItem value="done">Done</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
+            {/* Deadline input */}
+            <div className="w-1/2 space-y-2">
+              <label
+                htmlFor="deadline"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Deadline
+              </label>
+              <div className="relative border border-gray-300 rounded-md p-1">
+                <input
+                  id="deadline"
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="w-full pl-10"
+                />
+              </div>
+            </div>
+          </div>
           {/* Sub Tasks */}
           <div className="space-y-2">
             <label
@@ -168,12 +203,14 @@ function TaskModal({ onClose }: { onClose: () => void }) {
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onClose}
+            title="Cancel"
             className="px-4 py-2 cursor-pointer text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
+            title="Save Task"
             className="px-4 py-2 text-sm font-medium text-white cursor-pointer bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Save Task

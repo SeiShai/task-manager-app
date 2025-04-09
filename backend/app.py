@@ -6,15 +6,15 @@ from datetime import datetime
 # Create Flask App
 app = Flask(__name__)
 
-# Enable CORS
-CORS(app)
-
 # Configure DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize DB
 db = SQLAlchemy(app)
+
+# Enable CORS
+CORS(app)
 
 # Task Model
 class Task(db.Model):
@@ -25,6 +25,7 @@ class Task(db.Model):
     deadline = db.Column(db.DateTime, nullable=True)
     subtasks = db.relationship('Subtask', backref='task', lazy=True, cascade="all, delete")
 
+    # Create a method to convert Task to dictionary
     def to_dict(self):
         return {
             'id': self.id,
@@ -38,9 +39,10 @@ class Task(db.Model):
 # Subtask Model
 class Subtask(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=True)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
 
+    # Create a method to convert Subtask to dictionary
     def to_dict(self):
         return {'id': self.id, 'title': self.title}
     
@@ -52,6 +54,7 @@ def get_tasks_by_status(status):
     if status not in valid_statuses:
         abort(400, description="Invalid status")
 
+    # Fetch tasks based on status
     tasks = Task.query.filter_by(status=status).all()
     return jsonify([task.to_dict() for task in tasks])
 
@@ -75,11 +78,11 @@ def create_task():
             abort(400, description="Invalid deadline format, expected YYYY-MM-DD")
 
     task = Task(
-        title=data['title'],
-        description=data['description'], 
-        status=data['status'],
-        deadline=deadline
-    )
+    title=data['title'],
+    description=data['description'], 
+    status=data['status'],
+    deadline=deadline,
+    subtasks=[Subtask(title=subtask if isinstance(subtask, str) else subtask['title']) for subtask in data.get('subTasks', [])])
 
     db.session.add(task)
     db.session.commit()

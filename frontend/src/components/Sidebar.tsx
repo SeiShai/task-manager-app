@@ -52,6 +52,8 @@ function Sidebar() {
 
         <button
           onClick={toggleSidebar}
+          title="Toggle Sidebar"
+          aria-label="Toggle Sidebar"
           className="bg-purple-700 text-white rounded-full cursor-pointer p-1 shadow-md hover:bg-purple-800 transition-colors"
         >
           {isExpanded ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}

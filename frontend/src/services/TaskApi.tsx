@@ -34,15 +34,18 @@ export const createTask = async (taskData: {
   }
 };
 
-// Update an existing task
+// Update the TaskData type to handle subtasks as objects
+type SubtaskData = string | { id?: number; title: string };
+
 type TaskData = {
   title: string;
   description: string;
   status: string;
   deadline: string;
-  subTasks: string[];
+  subTasks: SubtaskData[];
 };
 
+// Update an existing task
 export const updateTask = async (id: number, taskData: Partial<TaskData>) => {
   try {
     const response = await axios.put(`${API_BASE_URL}/${id}`, taskData, {

@@ -64,7 +64,7 @@ function Tasks() {
         </div>
       </div>
 
-      {isModalOpen && <TaskModal onClose={() => setIsModalOpen(false)} refreshTasks={loadTasks} />}
+      {isModalOpen && <TaskModal onClose={() => setIsModalOpen(false)} refreshTasks={loadTasks} mode="create" />}
     </div>
   );
 }
@@ -78,7 +78,6 @@ interface Task {
 }
 
 function TaskColumn({ title, tasks, refreshTasks }: { title: string; tasks: Task[]; refreshTasks: () => void }) {
-  // Map column title to status
   const getStatus = () => {
     switch (title) {
       case "Pending":
@@ -95,8 +94,8 @@ function TaskColumn({ title, tasks, refreshTasks }: { title: string; tasks: Task
   // Handle task deletion
   const handleDelete = async (id: string) => {
     try {
-      await deleteTask(Number(id)); // Call the API to delete the task
-      refreshTasks(); // Refresh the task list after deletion
+      await deleteTask(Number(id));
+      refreshTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -111,12 +110,14 @@ function TaskColumn({ title, tasks, refreshTasks }: { title: string; tasks: Task
           {tasks.map((task) => (
             <TaskCard
               key={task.id}
+              id={Number(task.id)}
               title={task.title}
               description={task.description}
               deadline={task.deadline}
               subtasks={task.subtasks}
               status={getStatus()}
               onDelete={() => handleDelete(task.id)}
+              refreshTasks={refreshTasks}
             />
           ))}
         </div>

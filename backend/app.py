@@ -93,7 +93,7 @@ def create_task():
 # API Route: Update Task
 @app.route('/tasks/<int:id>', methods=['PUT'])
 def update_task(id):
-    task = Task.query.get_or_404(id)  # Ensure the task exists
+    task = Task.query.get_or_404(id) 
     data = request.json
 
     if not data:
@@ -117,6 +117,20 @@ def update_task(id):
                 abort(400, description="Invalid deadline format, expected YYYY-MM-DD")
         else:
             task.deadline = None
+            
+    # Handle subtasks update
+    if 'subTasks' in data:
+        # Remove existing subtasks
+        for subtask in task.subtasks:
+            db.session.delete(subtask)
+        
+        # Add new subtasks
+        for subtask_data in data['subTasks']:
+            if isinstance(subtask_data, str):
+                new_subtask = Subtask(title=subtask_data, task_id=task.id)
+            else:
+                new_subtask = Subtask(title=subtask_data.get('title', ''), task_id=task.id)
+            db.session.add(new_subtask)
 
     db.session.commit()
     return jsonify(task.to_dict()), 200

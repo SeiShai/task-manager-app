@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Trash2 } from "lucide-react";
 import {
   Select,
@@ -7,15 +7,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createTask } from "@/services/TaskApi";
+import { createTask, updateTask } from "@/services/TaskApi";
 
-function TaskModal({ onClose, refreshTasks }: { onClose: () => void; refreshTasks: () => void }) {
+// Define the Task type
+type Task = {
+  id?: number;
+  title: string;
+  description: string;
+  status: string;
+  deadline: string;
+  subtasks: { id: number; title: string }[];
+};
+
+type TaskModalProps = {
+  onClose: () => void;
+  refreshTasks: () => void;
+  task?: Task;
+  mode: "create" | "update";
+};
+
+function TaskModal({ onClose, refreshTasks, task, mode }: TaskModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
   const [deadline, setDeadline] = useState("");
   const [subTask, setSubTask] = useState("");
   const [subTasks, setSubTasks] = useState<string[]>([]);
+
+  // Load task data if in update mode
+  useEffect(() => {
+    if (mode === "update" && task) {
+      setTitle(task.title);
+      setDescription(task.description);
+      setStatus(task.status);
+      setDeadline(task.deadline);
+      setSubTasks(task.subtasks.map(st => st.title));
+    }
+  }, [mode, task]);
 
   // Function to handle adding a subtask
   const handleAddSubTask = () => {
@@ -27,25 +55,42 @@ function TaskModal({ onClose, refreshTasks }: { onClose: () => void; refreshTask
 
   // Function to handle removing a subtask
   const handleRemoveSubTask = (index: number) => {
-    setSubTasks(subTasks.filter((_, i) => i !== index));
+    const newSubTasks = [...subTasks];
+    newSubTasks.splice(index, 1);
+    setSubTasks(newSubTasks);
   };
 
-  // Function to print form submission
+  // Function to handle form submission
   const handleSubmit = async () => {
-    const taskData = {
-      title,
-      description,
-      status,
-      deadline,
-      subTasks,
-    };
     try {
-      const savedTask = await createTask(taskData);
-      console.log("Task saved:", savedTask);
+      if (mode === "create") {
+        const taskData = {
+          title,
+          description,
+          status,
+          deadline,
+          subTasks,
+        };
+        const savedTask = await createTask(taskData);
+        console.log("Task created:", savedTask);
+      } else if (mode === "update" && task?.id) {
+        const taskData = {
+          title,
+          description,
+          status,
+          deadline,
+          subTasks: subTasks.map(subtaskTitle => ({ title: subtaskTitle })),
+        };
+        
+        console.log("Sending update with data:", taskData);
+        const updatedTask = await updateTask(task.id, taskData);
+        console.log("Task updated:", updatedTask);
+      }
+      
       refreshTasks();
       onClose();
     } catch (error) {
-      console.error("Error saving task:", error);
+      console.error(`Error ${mode === "create" ? "creating" : "updating"} task:`, error);
     }
   };
 
@@ -55,7 +100,7 @@ function TaskModal({ onClose, refreshTasks }: { onClose: () => void; refreshTask
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Add New Task
+            {mode === "create" ? "Add New Task" : "Update Task"}
           </h2>
           <button
             onClick={onClose}
@@ -182,12 +227,12 @@ function TaskModal({ onClose, refreshTasks }: { onClose: () => void; refreshTask
                 {subTasks.map((task, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between bg-gray-50 p-2 rounded-md group"
+                    className="flex items-center justify-between bg-gray-50 p-2 rounded-md"
                   >
                     <span className="text-sm text-gray-700">{task}</span>
                     <button
                       onClick={() => handleRemoveSubTask(index)}
-                      className="opacity-0 group-hover:opacity-100 cursor-pointer text-red-500 hover:text-red-700 transition-opacity"
+                      className="text-red-500 hover:text-red-700 transition-colors"
                       aria-label="Remove sub task"
                     >
                       <Trash2 size={16} />
@@ -210,10 +255,10 @@ function TaskModal({ onClose, refreshTasks }: { onClose: () => void; refreshTask
           </button>
           <button
             onClick={handleSubmit}
-            title="Save Task"
+            title={mode === "create" ? "Save Task" : "Update Task"}
             className="px-4 py-2 text-sm font-medium text-white cursor-pointer bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Save Task
+            {mode === "create" ? "Save Task" : "Update Task"}
           </button>
         </div>
       </div>

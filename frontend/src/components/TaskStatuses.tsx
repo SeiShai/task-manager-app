@@ -10,6 +10,7 @@ interface Task {
   subtasks: { id: number; title: string }[];
 }
 
+
 interface TaskStatusesProps {
   pendingTasks: Task[];
   inProgressTasks: Task[];
@@ -60,8 +61,8 @@ function TaskColumn({ title, tasks, refreshTasks }: { title: string; tasks: Task
   // Handle task deletion
   const handleDelete = async (id: string) => {
     try {
-      await deleteTask(Number(id)); // Call the API to delete the task
-      refreshTasks(); // Refresh the task list after deletion
+      await deleteTask(Number(id));
+      refreshTasks();
     } catch (error) {
       console.error("Error deleting task:", error);
     }

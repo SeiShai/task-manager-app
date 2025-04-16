@@ -4,11 +4,13 @@ import TaskStatuses from "@/components/TaskStatuses";
 import TaskOverview from "@/components/TaskOverview";
 import { fetchTasksByStatus } from "@/services/TaskApi";
 
+// Dashboard Component
 function Dashboard() {
   const [pendingTasks, setPendingTasks] = useState([]);
   const [inProgressTasks, setInProgressTasks] = useState([]);
   const [doneTasks, setDoneTasks] = useState([]);
 
+  // Fetch tasks by status
   const refreshTasks = async () => {
     try {
       const [pending, inProgress, done] = await Promise.all([
@@ -24,10 +26,12 @@ function Dashboard() {
     }
   };
 
+  // Load tasks on component mount
   useEffect(() => {
     refreshTasks();
   }, []);
 
+  // Calculate total tasks
   const totalTasks =
     pendingTasks.length + inProgressTasks.length + doneTasks.length;
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TaskModal from "./Modal"; 
 
+// TaskCardProps interface defines the properties for the TaskCard component
 type TaskCardProps = {
   id: number;
   title: string;
@@ -12,6 +13,7 @@ type TaskCardProps = {
   refreshTasks: () => void;
 };
 
+// TaskCard component to display individual task details
 const TaskCard: React.FC<TaskCardProps> = ({
   id,
   title,
@@ -22,6 +24,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   onDelete,
   refreshTasks
 }) => {
+  // State to manage the visibility of the update modal
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   // Determine background color based on status

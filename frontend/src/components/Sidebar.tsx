@@ -13,6 +13,7 @@ function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const location = useLocation();
 
+  // Define the navigation items
   const navItems = [
     {
       name: "Dashboard",
@@ -24,6 +25,7 @@ function Sidebar() {
     { name: "Home", icon: <Home size={20} />, path: "/" },
   ];
 
+  // Function to toggle the sidebar
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };

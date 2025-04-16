@@ -5,6 +5,7 @@ type AddTaskButtonProps = {
   refreshTasks: () => void;
 };
 
+// This component renders a button that opens a modal for adding a new task
 const AddTaskButton: React.FC<AddTaskButtonProps> = ({ refreshTasks }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 

@@ -47,6 +47,11 @@ class Subtask(db.Model):
         return {'id': self.id, 'title': self.title}
     
 
+# API Route: Home
+@app.route('/')
+def home():
+    return "Welcome to the Task Management API!"
+
 # API Route: Get All Tasks
 @app.route('/tasks/<string:status>', methods=['GET'])
 def get_tasks_by_status(status):
